@@ -22,10 +22,7 @@ def serialize(chess_game: ChessGame) -> bytes:
         "game_id": chess_game.game_id,
         "board": {
             "pieces": {
-                repr(k): {
-                    "piece_type": v.piece_type.value,
-                    "color": v.color.value,
-                }
+                repr(k): {"piece_type": v.piece_type.value, "color": v.color.value}
                 for k, v in chess_game.board.pieces.items()
             },
         },
