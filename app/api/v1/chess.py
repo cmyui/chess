@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 import logging
-from typing import Literal
 from uuid import UUID
 
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Response
 from pydantic import BaseModel
-from typing_extensions import TypedDict
 
 from app.api import responses
 from app.authentication import authenticate_user
@@ -19,8 +17,6 @@ from app.chess import ChessPieceColor
 from app.chess import is_valid_file
 from app.chess import is_valid_rank
 from app.chess import Move
-from app.chess import VALID_FILES
-from app.chess import VALID_RANKS
 from app.context import APIRequestContext
 from app.repositories import chess_games
 
