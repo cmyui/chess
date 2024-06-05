@@ -1,7 +1,12 @@
+from __future__ import annotations
+
+from enum import StrEnum
+from typing import Any
 from uuid import UUID
+
 import bcrypt
 import jwt
-from enum import StrEnum
+
 from app import settings
 from app.json import JSONEncoder
 
@@ -27,9 +32,12 @@ def create_access_token(user_id: UUID) -> str:
     )
 
 
-def decode_access_token(access_token: str) -> dict:
-    return jwt.decode(
+def decode_access_token(access_token: str) -> dict[Any, Any]:
+    payload = jwt.decode(
         access_token,
         settings.JWT_PRIVATE_KEY,
         algorithms=["HS256"],
     )
+    if not isinstance(payload, dict):
+        raise ValueError("Invalid JWT payload structure")
+    return payload

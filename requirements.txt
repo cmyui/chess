@@ -1,5 +1,6 @@
+bcrypt
 fastapi
 pydantic
 pyjwt
-bcrypt
 redis
+uvicorn

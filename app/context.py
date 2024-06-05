@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from abc import ABC
 
-from fastapi import Request
 import redis.asyncio as aioredis
+from fastapi import Request
 
 
 class AbstractContext(ABC):

@@ -1,11 +1,16 @@
+from __future__ import annotations
+
 from uuid import UUID
-from fastapi import APIRouter, Response, Depends
+
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import Response
 from pydantic import BaseModel
 
 from app import security
+from app.api import responses
 from app.context import APIRequestContext
 from app.repositories import accounts
-from app.api import responses
 
 router = APIRouter()
 
@@ -52,6 +57,6 @@ async def create_account(
                 secure=True,
                 httponly=True,
                 samesite="strict",
-            )
+            ),
         ],
     )

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 
-from uuid import UUID, uuid4
+from uuid import UUID
+from uuid import uuid4
+
 from pydantic import BaseModel
 
 from app.context import AbstractContext
@@ -34,7 +37,7 @@ async def get_account_by_id(
     user_id: UUID,
 ) -> Account | None:
     account_data: bytes | None = await context.redis_connection.get(
-        f"account:{user_id}"
+        f"account:{user_id}",
     )
     if account_data is None:
         return None
@@ -42,10 +45,11 @@ async def get_account_by_id(
 
 
 async def get_account_by_username(
-    context: AbstractContext, username: str
+    context: AbstractContext,
+    username: str,
 ) -> Account | None:
     account_data: bytes | None = await context.redis_connection.get(
-        f"account:{username}"
+        f"account:{username}",
     )
     if account_data is None:
         return None

@@ -1,8 +1,15 @@
-from datetime import datetime
+from __future__ import annotations
+
 import json
-from typing import Any, Literal, Mapping
-from fastapi import BackgroundTasks, Response
+from collections.abc import Mapping
+from datetime import datetime
+from typing import Any
+from typing import Literal
+
+from fastapi import BackgroundTasks
+from fastapi import Response
 from pydantic import BaseModel
+
 from app.json import JSONEncoder
 
 

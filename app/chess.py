@@ -1,12 +1,26 @@
+from __future__ import annotations
+
 from enum import StrEnum
 from typing import Literal
+from typing import TypeGuard
 from uuid import UUID
 
 from pydantic import BaseModel
 
 
 FileType = Literal["A", "B", "C", "D", "E", "F", "G", "H"]
+VALID_FILES: list[FileType] = ["A", "B", "C", "D", "E", "F", "G", "H"]
+
 RankType = Literal["1", "2", "3", "4", "5", "6", "7", "8"]
+VALID_RANKS: list[RankType] = ["1", "2", "3", "4", "5", "6", "7", "8"]
+
+
+def is_valid_file(input: str) -> TypeGuard[FileType]:
+    return input in VALID_FILES
+
+
+def is_valid_rank(input: str) -> TypeGuard[RankType]:
+    return input in VALID_RANKS
 
 
 class ChessPieceType(StrEnum):
@@ -27,7 +41,7 @@ class ChessPiece(BaseModel):
     piece_type: ChessPieceType
     color: ChessPieceColor
 
-    def can_make_move(self, move: "Move") -> bool:
+    def can_make_move(self, move: Move) -> bool:
         if self.piece_type is ChessPieceType.KING:
             return self._can_king_move(move)
         if self.piece_type is ChessPieceType.QUEEN:
@@ -43,7 +57,7 @@ class ChessPiece(BaseModel):
 
         return False
 
-    def _can_king_move(self, move: "Move") -> bool:
+    def _can_king_move(self, move: Move) -> bool:
         # Kings may move in any direction, but only one square at a time.
         # This includes diagonally, horizontally, and vertically.
         return (
@@ -51,24 +65,24 @@ class ChessPiece(BaseModel):
             and abs(int(move.square_from.rank) - int(move.square_to.rank)) <= 1
         )
 
-    def _can_queen_move(self, move: "Move") -> bool:
+    def _can_queen_move(self, move: Move) -> bool:
         # Queens may move in any direction, but they cannot jump over other pieces.
         return self._can_rook_move(move) or self._can_bishop_move(move)
 
-    def _can_rook_move(self, move: "Move") -> bool:
+    def _can_rook_move(self, move: Move) -> bool:
         # Rooks may move horizontally or vertically, but they cannot jump over other pieces.
         return (
             move.square_from.file == move.square_to.file
             or move.square_from.rank == move.square_to.rank
         )
 
-    def _can_bishop_move(self, move: "Move") -> bool:
+    def _can_bishop_move(self, move: Move) -> bool:
         # Bishops may move diagonally, but they cannot jump over other pieces.
         return abs(ord(move.square_from.file) - ord(move.square_to.file)) == abs(
-            int(move.square_from.rank) - int(move.square_to.rank)
+            int(move.square_from.rank) - int(move.square_to.rank),
         )
 
-    def _can_knight_move(self, move: "Move") -> bool:
+    def _can_knight_move(self, move: Move) -> bool:
         # Knights may move in an L-shape, two squares in one direction and one square in the other.
         return (
             abs(ord(move.square_from.file) - ord(move.square_to.file)) == 1
@@ -77,7 +91,7 @@ class ChessPiece(BaseModel):
             and abs(int(move.square_from.rank) - int(move.square_to.rank)) == 1
         )
 
-    def _can_pawn_move(self, move: "Move") -> bool:
+    def _can_pawn_move(self, move: Move) -> bool:
         # Pawns may move forward one square, but they capture diagonally.
         # Pawns may move two squares forward on their first move.
         # Pawns may not move backwards.
@@ -116,7 +130,7 @@ class ChessBoard(BaseModel):
     def remove_piece(self, square: BoardSquare) -> None:
         del self.pieces[square]
 
-    def is_square_occupied(self, square: BoardSquare):
+    def is_square_occupied(self, square: BoardSquare) -> bool:
         return square in self.pieces
 
     def get_piece_on_square(self, square: BoardSquare) -> ChessPiece | None:
@@ -126,8 +140,8 @@ class ChessBoard(BaseModel):
         self.pieces = {square: piece for square, piece in STARTING_POSITION.items()}
 
     def print_chess_board(self) -> None:
-        for rank in ("8", "7", "6", "5", "4", "3", "2", "1"):
-            for file in ("A", "B", "C", "D", "E", "F", "G", "H"):
+        for rank in VALID_RANKS:
+            for file in VALID_FILES:
                 square = BoardSquare(file=file, rank=rank)
                 piece = self.get_piece_on_square(square)
                 if piece is not None:

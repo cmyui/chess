@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
+
+import redis.asyncio as aioredis
 from fastapi import FastAPI
+
 from app import settings
 from app.api.v1 import v1_router
-import redis.asyncio as aioredis
 
 
 @asynccontextmanager
@@ -15,7 +19,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         port=settings.REDIS_PORT,
         db=0,
     )
-    await app.state._redis_connection.initialize()
+    await app.state._redis_connection.initialize()  # type: ignore[unused-awaitable]
     yield
     print("Application shutting down")
     await app.state._redis_connection.aclose()

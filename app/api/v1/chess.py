@@ -1,30 +1,30 @@
-import logging
-from uuid import UUID
-from fastapi import APIRouter, Response
-from pydantic import BaseModel
-from typing import Literal
-from typing_extensions import TypedDict
-from app.api import responses
+from __future__ import annotations
 
+import logging
+from typing import Literal
+from uuid import UUID
+
+from fastapi import APIRouter
 from fastapi import Depends
-from app.authentication import IdentityContext, authenticate_user
-from app.chess import (
-    BoardSquare,
-    ChessPiece,
-    Move,
-    ChessPieceColor,
-)
+from fastapi import Response
+from pydantic import BaseModel
+from typing_extensions import TypedDict
+
+from app.api import responses
+from app.authentication import authenticate_user
+from app.authentication import IdentityContext
+from app.chess import BoardSquare
+from app.chess import ChessPiece
+from app.chess import ChessPieceColor
+from app.chess import is_valid_file
+from app.chess import is_valid_rank
+from app.chess import Move
+from app.chess import VALID_FILES
+from app.chess import VALID_RANKS
 from app.context import APIRequestContext
 from app.repositories import chess_games
 
 router = APIRouter()
-
-
-ValidRanks = Literal["1", "2", "3", "4", "5", "6", "7", "8"]
-VALID_RANKS: list[ValidRanks] = ["1", "2", "3", "4", "5", "6", "7", "8"]
-
-ValidFiles = Literal["A", "B", "C", "D", "E", "F", "G", "H"]
-VALID_FILES: list[ValidFiles] = ["A", "B", "C", "D", "E", "F", "G", "H"]
 
 
 def convert_input_to_board_square(pos: str) -> BoardSquare | None:
@@ -32,9 +32,9 @@ def convert_input_to_board_square(pos: str) -> BoardSquare | None:
         if len(pos) != 2:
             return None
         file, rank = pos[0], pos[1]
-        if file not in VALID_FILES:
+        if not is_valid_file(file):
             return None
-        if rank not in VALID_RANKS:
+        if not is_valid_rank(rank):
             return None
         return BoardSquare(file=file, rank=rank)
     except Exception:

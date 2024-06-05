@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import secrets
 from uuid import uuid4
-from app.chess import (
-    ChessGame,
-    BoardSquare,
-    ChessPiece,
-    ChessPieceColor,
-    ChessPieceType,
-    Move,
-)
+
+from app.chess import BoardSquare
+from app.chess import ChessGame
+from app.chess import ChessPiece
+from app.chess import ChessPieceColor
+from app.chess import ChessPieceType
+from app.chess import Move
 
 if __name__ == "__main__":
     chess_game = ChessGame(

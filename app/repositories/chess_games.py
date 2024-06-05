@@ -1,16 +1,18 @@
-import json
-from uuid import UUID, uuid4
-from app.chess import (
-    BoardSquare,
-    ChessBoard,
-    ChessGame,
-    ChessPiece,
-    ChessPieceColor,
-    ChessPieceType,
-    Move,
-)
-import secrets
+from __future__ import annotations
 
+import json
+import logging
+import secrets
+from uuid import UUID
+from uuid import uuid4
+
+from app.chess import BoardSquare
+from app.chess import ChessBoard
+from app.chess import ChessGame
+from app.chess import ChessPiece
+from app.chess import ChessPieceColor
+from app.chess import ChessPieceType
+from app.chess import Move
 from app.context import AbstractContext
 from app.json import JSONEncoder
 
@@ -22,7 +24,7 @@ def serialize(chess_game: ChessGame) -> bytes:
             "pieces": {
                 repr(k): {"piece_type": v.piece_type.value, "color": v.color.value}
                 for k, v in chess_game.board.pieces.items()
-            }
+            },
         },
         "move_history": [
             {
@@ -58,7 +60,7 @@ def deserialize(data: bytes) -> ChessGame:
             pieces={
                 BoardSquare(file=k[0], rank=k[1]): v
                 for k, v in obj["board"]["pieces"].items()
-            }
+            },
         ),
         move_history=[
             Move(
@@ -104,7 +106,7 @@ async def create_chess_game(
 
 async def get_chess_game(context: AbstractContext, game_id: UUID) -> ChessGame | None:
     game_data: bytes | None = await context.redis_connection.get(
-        f"chess_game:{game_id}"
+        f"chess_game:{game_id}",
     )
     if game_data is None:
         return None
@@ -114,7 +116,14 @@ async def get_chess_game(context: AbstractContext, game_id: UUID) -> ChessGame |
 async def get_all_chess_games(context: AbstractContext) -> list[ChessGame]:
     chess_games: list[ChessGame] = []
     for key in await context.redis_connection.keys("chess_game:*"):
-        game_data = await context.redis_connection.get(key)
+        game_data: bytes | None = await context.redis_connection.get(key)
+        if game_data is None:
+            logging.warning(
+                "Failed to deserialize chess game data for key %s",
+                key,
+                extra={"context": {"key": key}},
+            )
+            continue
         chess_game = deserialize(game_data)
         chess_games.append(chess_game)
     return chess_games
